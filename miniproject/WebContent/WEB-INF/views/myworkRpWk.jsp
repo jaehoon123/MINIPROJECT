@@ -3,6 +3,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ include file="/WEB-INF/views/common/include.jsp" %>
+<%
+	String msg = request.getParameter("msg") == "" ? "" :  request.getParameter("msg");
+%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -34,34 +37,18 @@
 		<c:import url="side_bar.jsp"></c:import>
 		<c:import url="nav_top.jsp"></c:import>
 		<div id="main" >
+			<input id="msg" type="hidden" value="<%=msg%>"/>
+			<input id="createId" type="hidden" value="${user.userId}"/>
 			<div style="margin-inline:30px;height: 80px;background-color:#d1d7ed6b;padding-top: 20px;padding-bottom: 100px;margin-top: 10px;">
 				<table style="border-collapse: separate;border-spacing: 10px;">
 					<tr>
 						<th style="width:80px;text-align:right">제목</th>
-						<td style="width:200px">
-							<input id="subjectSch" style="width:150px"/>
+						<td style="width:200px" colspan="5">
+							<input id="subjectSch" style="width:500px"/>
 						</td>
-						<th style="width:80px;text-align:right">부서</th>
-						<td style="width:230px">
-							<div class="search">
-								<input id="deptCdSch" style="width:80px;border-width: thin;background-color:#80808021" readonly/>
-								<input id="deptNmSch" style="width:120px" />
-								<img style="margin-right: 15px;margin-top: -3px;cursor:hand" src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png">
-							</div>
-						</td>
-						<th style="width:80px;text-align:right">작성자</th>
-						<td style="width:230px">
-							<div class="search">
-								<input id="createCdSch" style="width:80px;border-width: thin;background-color:#80808021" readonly/>
-								<input id="createNmSch" style="width:120px" />
-								<img style="margin-right: 15px;margin-top: -3px;cursor:hand" src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png">
-							</div>
-						</td>
-						<th style="width:80px;text-align:right"></th>
-						<td style="width:200px">
-						</td>
+						
 						<td rowspan="2">
-							<button type="button" class="btn btn-primary" style="margin-left:100px;width:120px" onclick="getList()">검색</button>
+							<button type="button" class="btn btn-primary" style="margin-left:200px;width:120px" onclick="getList()">검색</button>
 						</td>
 					</tr>
 					<tr>
@@ -84,8 +71,8 @@
 					</div>
 					<div id="grid1"></div>
 					<div style="float:right;margin-top:10px;margin-right:10px">
-						<button type="button" class="btn btn-primary" id="weekUpdate"  style="width:100px">수정</button>
-						<button type="button" class="btn btn-primary" id="weekDel"  style="width:100px">삭제</button>
+						<button type="button" class="btn btn-primary" id="weekUpdate"  style="width:100px" onclick="setUpdate()">수정</button>
+						<button type="button" class="btn btn-primary" id="weekDel"  style="width:100px" onclick="setDel()">삭제</button>
 					</div>
 				</div>
 			</div>
@@ -98,6 +85,10 @@
 				// 최초 조회 
 				getList();
 				
+				var msg = $('#msg').val();
+				if(msg !== 'null'){
+					alert(msg);
+				}
 				
 			});
 			var grid1;
@@ -111,30 +102,37 @@
 					bodyHeight : 500,
 					scrollX : false,
 					scrollY : false,
-					rowHeaders: ['rowNum'],
+					rowHeaders: ['checkbox','rowNum'],
 					columns : [ 
 						{header : '작성자'   , name : 'createId' , width: 200, align: 'center'}
 						, {header : '부서'  , name : 'deptNm'   , width: 200, align: 'center'}
 						, {header : '제목'  , name : 'subject', align: 'left'}
 						, {header : '금주운영업무내용'  , name : 'weekRpJobCt' , align: 'left'}
+						, {header : '키값'  , name : 'weekId' , align: 'left', hidden: true}
+						, {header : '삭제여부'  , name : 'deleteYn' , align: 'left', hidden: true}
 					]
+				});
+				
+				grid1.on('dblclick', (ev) => {
+					var rowData = grid1.getRow(ev.rowKey);
+					location.href='workWrite?weekId=' + rowData.weekId + '&flag=' + 'select';
 				});
 
 			}
 			
 			//그리드 생성
 			function getList() {
-				var createId = $('#createCdSch').val();
+				var createId = $('#createId').val();
 				var deptCode = $('#deptCdSch').val();
 				var subject = $('#subjectSch').val();
-				var weekRpJobCt = $('#weekRpJobCtSch').val();
+				var weekJobRp = $('#weekJobRpSch').val();
 				var deleteYn = document.getElementById('deleteYnSch').checked === true ? 'Y' : 'N';
 				
 				var param = {
 					subject: subject,
 					deptCode: deptCode, 
 					createId: createId,
-					weekRpJobCt: weekRpJobCt,
+					weekJobRp: weekJobRp,
 					deleteYn: deleteYn,
 				};
 				
@@ -167,6 +165,59 @@
 				});		
 			}
 			
+			function setUpdate() {
+				var data = grid1.getCheckedRows();
+				
+				if(data.length > 1){
+					alert('수정은 하나씩 가능합니다.');
+					return;
+				}
+				
+				location.href='workWrite?weekId=' + data[0].weekId + '&flag=' + 'update'; 		
+			}
+			
+			function setDel() {
+				var data = grid1.getCheckedRows();
+				
+				for (var i = 0; i < data.length; i++) {
+					if(data[0].deleteYn === 'Y'){
+						alert('이미 삭제된 데이터가 포함되어있습니다.');
+						return;
+					} 
+				}
+				
+				if (!confirm("선택한 데이터를 삭제 하시겠습니까?")) {
+					return;
+		        } 
+				
+				$.ajax({
+					url: '${pageContext.request.contextPath}/setWeekDel', //주소
+					data: JSON.stringify(data), //전송 데이터
+					type: "POST", //전송 타입
+					async: true, //비동기 여부
+					timeout: 5000, //타임 아웃 설정
+					dataType: "JSON", //응답받을 데이터 타입 (XML,JSON,TEXT,HTML,JSONP)    			
+					contentType: "application/json; charset=utf-8", //헤더의 Content-Type을 설정
+					    			
+					// [응답 확인 부분 - json 데이터를 받습니다]
+					success: function(response) {
+						gridData = response.boardList;
+						
+						grid1.resetData(gridData); 
+						$('#weekTotal').text(gridData.length);
+					},
+					    			
+					// [에러 확인 부분]
+					error: function(xhr) {
+						   				
+					},
+					    			
+					// [완료 확인 부분]
+					complete:function(data,textStatus) {
+						    				
+					}
+				});		
+			}
 		</script>
 	</body>
 </html>

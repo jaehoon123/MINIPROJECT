@@ -8,10 +8,14 @@
 		     , A.SUBJECT
 		     , A.DEPT_CODE
 		     , A.CREATE_ID
-		     , A.CREATE_DATE
+		     , TO_CHAR(TO_DATE(A.CREATE_DATE), 'YYYY-MM-DD') AS CREATE_DATE 
 		     , A.UPDATE_DATE
 		     , A.DELETE_YN
-		     , B.WEEK_RP_JOB_CT
+		     , B.WEEK_JOB_RP
+		     , B.NXWEEK_JOB_RP
+		     , B.WEEK_JOB_PL
+		     , B.NXWEEK_JOB_PL
+		     , B.ETC
 		  FROM WEEK_JOB_REPORT    A
 		 INNER JOIN WEEK_JOB_DETAIL_REPORT  B
 		    ON A.WEEK_ID = B.WEEK_ID
@@ -22,16 +26,153 @@
 		 <if test='deptCode != null and deptCode != ""'>
 		   AND A.DEPT_CODE = #{deptCode} 		 
 		 </if>
+		 <if test='deptNm != null and deptNm != ""'>
+		   AND A.DEPT_NM LIKE '%' || #{deptNm} || '%' 		 
+		 </if>
 		 <if test='createId != null and createId != ""'>
 		   AND A.CREATE_ID = #{createId} 		 
 		 </if>
-		 <if test='weekRpJobCt != null and weekRpJobCt != ""'>
-		   AND WEEK_RP_JOB_CT LIKE '%' || #{weekRpJobCt} || '%' 		 
+		 <if test='weekJobRp != null and weekJobRp != ""'>
+		   AND WEEK_JOB_RP LIKE '%' || #{weekJobRp} || '%' 		 
 		 </if>
 		 <if test='deleteYn == "Y"'>
 		   AND DELETE_YN = 'Y'		 
 		 </if>
+		 <if test='deleteYn == "N"'>
+		   AND DELETE_YN = 'N'		 
+		 </if>
 	</select> 
 	
+	<insert id="setReport" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReport*/
+		INSERT INTO week_job_report (
+		    WEEK_ID,
+		    SUBJECT,
+		    DEPT_CODE,
+		    CREATE_ID,
+		    CREATE_DATE,
+		    UPDATE_DATE,
+		    DELETE_YN
+		) VALUES (
+		    DECODE((SELECT COUNT(WEEK_ID) FROM WEEK_JOB_REPORT  WHERE 1=1 AND CREATE_ID = #{createId}), 0, 
+		            #{createId}||TO_CHAR(SYSDATE, 'YYMMDD')||'0001'
+		             , #{createId}|| TO_CHAR(SYSDATE, 'YYMMDD') 
+		                    || LPAD(TO_CHAR(TO_NUMBER(SUBSTR(#{createId}||TO_CHAR(SYSDATE, 'YYMMDD')||'0001', 11,4)) + 1), 4, '0'))
+		    , TO_CHAR(SYSDATE, 'YYYY-MM-DD') || #{subject} 	
+		    , #{createId} 	
+		    , #{deptCode}
+		    , SYSDATE
+		    , SYSDATE
+		    , 'N'
+		)
+	</insert>
+	
+	<insert id="setReportD" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReportD*/
+		
+		INSERT INTO WEEK_JOB_DETAIL_REPORT (
+		    WEEK_ID,
+		    WEEK_JOB_RP,
+		    NXWEEK_JOB_RP,
+		    WEEK_JOB_PL,
+		    NXWEEK_JOB_PL,
+		    CREATE_ID,
+		    CREATE_DATE,
+		    UPDATE_DATE,
+		    ETC
+		) SELECT A.* 
+			FROM (
+			    SELECT WEEK_ID
+			          , #{weekJobRp} 		AS WEEK_JOB_RP
+			          , #{nxweekJobRp} 	AS NXWEEK_JOB_RP
+			          , #{weekJobPl}	  	AS WEEK_JOB_PL
+			          , #{nxweekJobPl} 	AS NXWEEK_JOB_PL
+			          , CREATE_ID
+			          , CREATE_DATE
+			          , UPDATE_DATE
+			          , #{etc} 			AS ETC
+			      FROM WEEK_JOB_REPORT
+			     WHERE 1=1 
+			     ORDER BY ROWNUM DESC
+			     ) A
+			 WHERE 1=1 
+			   AND ROWNUM = 1
+	</insert>
+	
+	<insert id="setReportImsi" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReportImsi*/
+		INSERT INTO WEEK_JOB_REPORT_IMSI (
+		    WEEK_ID,
+		    SUBJECT,
+		    DEPT_CODE,
+		    CREATE_ID,
+		    CREATE_DATE,
+		    UPDATE_DATE,
+		    DELETE_YN
+		) VALUES (
+		    DECODE((SELECT COUNT(WEEK_ID) FROM WEEK_JOB_REPORT), 0, 
+		            #{createId}||TO_CHAR(SYSDATE, 'YYMMDD')||'0001'
+		             , #{createId}|| TO_CHAR(SYSDATE, 'YYMMDD') 
+		                    || LPAD(TO_CHAR(TO_NUMBER(SUBSTR(#{createId}||TO_CHAR(SYSDATE, 'YYMMDD')||'0001', 11,4)) + 1), 4, '0'))
+		    , #{createId} 	
+		    , TO_CHAR(SYSDATE, 'YYYY-MM-DD') || #{subject} 	
+		    , #{deptCode}
+		    , SYSDATE
+		    , SYSDATE
+		    , 'N'
+		)
+	</insert>
+	
+	<insert id="setReportDImsi" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReportDImsi*/
+		
+		INSERT INTO WEEK_JOB_DETAIL_REPORT_IMSI (
+		    WEEK_ID,
+		    WEEK_JOB_RP,
+		    NXWEEK_JOB_RP,
+		    WEEK_JOB_PL,
+		    NXWEEK_JOB_PL,
+		    CREATE_ID,
+		    CREATE_DATE,
+		    UPDATE_DATE,
+		    ETC_CT
+		) SELECT A.* 
+			FROM (
+			    SELECT WEEK_ID
+			          , #{weekJobRp} AS WEEK_JOB_RP
+			          , #{nxweekJobRp} AS NXWEEK_JOB_RP
+			          , #{weekJobPl} AS WEEK_JOB_PL
+			          , #{nxweekJobPl} AS NXWEEK_JOB_PL
+			          , CREATE_ID
+			          , CREATE_DATE
+			          , UPDATE_DATE
+			      FROM WEEK_JOB_REPORT
+			     WHERE 1=1 
+			     ORDER BY ROWNUM DESC
+			     ) A
+			 WHERE 1=1 
+			   AND ROWNUM = 1
+	</insert>
+	
+	<update id="setReportUpD" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReportUpD*/
+		 UPDATE WEEK_JOB_DETAIL_REPORT
+			SET WEEK_JOB_RP = #{weekJobRp}
+			   ,NXWEEK_JOB_RP = #{nxweekJobRp}
+			   ,WEEK_JOB_PL = #{weekJobPl}
+			   ,NXWEEK_JOB_PL = #{nxweekJobPl}
+			   ,UPDATE_DATE = SYSDATE
+			   ,ETC = #{etc}
+			WHERE
+			    WEEK_ID = #{weekId}
+	</update>
+	
+	<update id="setWeekDel" parameterType="ojc.board.model.BoardVo">
+		/*ojc.board.repository.BoardMapper.setReportUpD*/
+		 UPDATE WEEK_JOB_REPORT
+			SET DELETE_YN = 'Y'
+			WHERE
+			    WEEK_ID = #{weekId}
+	</update>
 	
 </mapper>

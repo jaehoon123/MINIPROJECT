@@ -41,12 +41,11 @@
 						<td style="width:200px">
 						</td>
 						<td>
-							<button type="button" class="btn btn-primary" style="margin-left:150px">SEARCH</button>
+							<button type="button" class="btn btn-primary" style="margin-left:150px">검색</button>
 						</td>
 					</tr>
 				</table>
 			</div>		
-			<div style="margin-inline: 30px;background-color:#d1d7ed6b;padding-top: 10px;padding-bottom: 80px;padding-right: 10px;padding-left: 10px;margin-top:30px">
 			<div style="margin-inline: 30px;background-color:#d1d7ed6b;padding-top: 10px;padding-bottom: 130px;padding-right: 10px;padding-left: 10px;margin-top:30px">
 				<div style="margin-inline:30px;margin-top:40px;">
 					<h4 style="font-weight: bold;"><span style="font-size:23px">주요업무계획</span><span style="float:right;margin-right:10px;">total(<span id="total">0</span>)</span></h4>

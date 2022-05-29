@@ -49,30 +49,30 @@
 				grid1 = new tui.Grid({
 					el : document.getElementById('grid1'),
 					data : gridData,
-					bodyHeight : 300,
+					bodyHeight : 320,
 					scrollX : false,
 					scrollY : false,
 					rowHeaders: ['rowNum'],
 					columns : [ 
-						{header : '작성자'  , name : 'email' }
-						, {header : '제목' 	, name : 'password'}
-						, {header : '내용'    , name : 'password'}
-						, {header : '결재상태' , name : 'password'}
+						{header : '작성자'   , name : 'createId' , width: 200, align: 'center'}
+						, {header : '부서'  , name : 'deptNm'   , width: 200, align: 'center'}
+						, {header : '제목'  , name : 'subject', align: 'left'}
+						, {header : '금주운영업무내용'  , name : 'weekRpJobCt' , align: 'left'}
 					]
 				});
 				
 				grid2 = new tui.Grid({
 					el : document.getElementById('grid2'),
 					data : gridData,
-					bodyHeight : 300,
+					bodyHeight : 320,
 					scrollX : false,
 					scrollY : false,
 					rowHeaders: ['rowNum'],
 					columns : [ 
-						{header : '작성자'  , name : 'email' }
-						, {header : '제목'    , name : 'password'}
-						, {header : '내용'    , name : 'password'}
-						, {header : '결재상태' , name : 'password'}
+						{header : '작성자'   , name : 'createId' , width: 200, align: 'center'}
+						, {header : '부서'  , name : 'deptNm'   , width: 200, align: 'center'}
+						, {header : '제목'  , name : 'subject', align: 'left'}
+						, {header : '금주운영업무내용'  , name : 'weekRpJobCt' , align: 'left'}
 					]
 				});
 			}
@@ -80,12 +80,11 @@
 			//그리드 생성
 			function getList() {
 				var param = {
-					email: 'test',
-					password: '1111',
+					
 				};
 				
 				$.ajax({
-					url: '${pageContext.request.contextPath}/getBoardList', //주소
+					url: '${pageContext.request.contextPath}/getWeekJobList', //주소
 					data: JSON.stringify(param), //전송 데이터
 					type: "POST", //전송 타입
 					async: true, //비동기 여부

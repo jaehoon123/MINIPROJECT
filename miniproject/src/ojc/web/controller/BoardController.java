@@ -1,5 +1,7 @@
 package ojc.web.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,42 @@ public class BoardController {
 	public String getWeekJobList(ModelMap model, Login login, @RequestBody BoardVo boardVo) {
 		Object boardList = boardService.getWeekJobList(boardVo);
 		model.addAttribute("boardList", boardList);
+		
+		return "jsonView"; 
+	}
+	
+	@RequestMapping(value = "/setReport", method = { RequestMethod.POST})	
+	public String setReport(ModelMap model, Login login, @RequestBody BoardVo boardVo) {
+		if("1".equals(boardVo.getFlag())) {
+			boardService.setReport(boardVo);
+			boardService.setReportD(boardVo);			
+		}
+		return "jsonView"; 
+	}
+	
+	@RequestMapping(value = "/setReportImsi", method = { RequestMethod.POST})	
+	public String setReportImsi(ModelMap model, Login login, @RequestBody BoardVo boardVo) {
+		if("1".equals(boardVo.getFlag())) {
+			boardService.setReportImsi(boardVo);
+			boardService.setReportDImsi(boardVo);
+		}
+		return "jsonView"; 
+	}
+	
+	@RequestMapping(value = "/setReportUp", method = { RequestMethod.POST})	
+	public String setReportUp(ModelMap model, Login login, @RequestBody BoardVo boardVo) {
+		boardService.setReportUpD(boardVo);	
+		return "jsonView"; 
+	}
+	
+	@RequestMapping(value = "/setWeekDel", method = { RequestMethod.POST})	
+	public String setWeekDel(ModelMap model, Login login, @RequestBody List<BoardVo> boardVo) {
+		BoardVo resultData = new BoardVo();
+		
+		for(BoardVo paramData : boardVo) {
+			resultData.setWeekId(paramData.getWeekId());
+			boardService.setWeekDel(resultData);	
+		}
 		
 		return "jsonView"; 
 	}

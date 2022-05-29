@@ -7,12 +7,56 @@ public class BoardVo {
 	private String weekId;  
 	private String subject;  
 	private String deptCode;  
+	private String deptNm;  
 	private String createId;  
 	private String createDate;  
 	private String updateDate;  
 	private String deleteYn;  
-	private String weekRpJobCt;
+	private String weekJobRp;
+
+	private String nxweekJobRp;
+	private String weekJobPl;
+	private String nxweekJobPl;
+	private String etc;
+	private String flag;
+
 	
+	public final String getDeptNm() {
+		return deptNm;
+	}
+	public final void setDeptNm(String deptNm) {
+		this.deptNm = deptNm;
+	}
+	public final String getFlag() {
+		return flag;
+	}
+	public final void setFlag(String flag) {
+		this.flag = flag;
+	}
+	public final String getNxweekJobRp() {
+		return nxweekJobRp;
+	}
+	public final void setNxweekJobRp(String nxweekJobRp) {
+		this.nxweekJobRp = nxweekJobRp;
+	}
+	public final String getweekJobPl() {
+		return weekJobPl;
+	}
+	public final void setWeekJobPl(String weekJobPl) {
+		this.weekJobPl = weekJobPl;
+	}
+	public final String getNxweekJobPl() {
+		return nxweekJobPl;
+	}
+	public final void setnxweekJobPl(String nxweekJobPl) {
+		this.nxweekJobPl = nxweekJobPl;
+	}
+	public final String getEtc() {
+		return etc;
+	}
+	public final void setEtc(String etc) {
+		this.etc = etc;
+	}
 	public final String getWeekId() {
 		return weekId;
 	}
@@ -55,11 +99,11 @@ public class BoardVo {
 	public final void setDeleteYn(String deleteYn) {
 		this.deleteYn = deleteYn;
 	}
-	public final String getWeekRpJobCt() {
-		return weekRpJobCt;
+	public final String getweekJobRp() {
+		return weekJobRp;
 	}
-	public final void setWeekRpJobCt(String weekRpJobCt) {
-		this.weekRpJobCt = weekRpJobCt;
+	public final void setWeekJobRp(String weekJobRp) {
+		this.weekJobRp = weekJobRp;
 	}  
 	
 	
